@@ -90,7 +90,7 @@ def game():
                         floor = 288
 
                     pixelsMoved += 4
-                    if pixelsMoved >= 600 and (pixelsMoved / 200).is_integer():
+                    if pixelsMoved >= 400 and (pixelsMoved / 200).is_integer():
                         pipeSpawn = random.randint(50, 400)
 
                         pipes.append([350, pipeSpawn])
@@ -269,8 +269,8 @@ def game():
                             scoreNumberRect.center = (195 - (i * 25), 230)
                             screen.blit(scoreNumber, scoreNumberRect)
 
-                        for i in range(len(str(score))):
-                            highScoreDigit = str(score)[len(str(highScore)) - i - 1]
+                        for i in range(len(str(highScore))):
+                            highScoreDigit = str(highScore)[len(str(highScore)) - i - 1]
                             scoreNumber = pygame.image.load(f"assets/numbers/{highScoreDigit}.png").convert_alpha()
                             scoreNumberRect = scoreNumber.get_rect()
                             scoreNumberRect.center = (195 - (i * 25), 305)

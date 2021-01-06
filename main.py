@@ -1,6 +1,8 @@
 import pygame
 import random
 
+gravity = 0.4
+
 pygame.init()
 width, height = 288, 512
 backgroundColor = 255, 0, 0
@@ -66,6 +68,9 @@ while True:
             score = 0
             pixelsMoved = 0
             pipes = []
+            birdJump = False
+            birdJumpPixels = 0
+            birdFallPixels = 0
 
             while True:
                 clock.tick(30)
@@ -78,16 +83,12 @@ while True:
                 screen.blit(background, backgroundRect)
 
                 floor -= 4
-
                 if floor <= 0:
                     floor = 288
 
                 pixelsMoved += 4
-
                 if pixelsMoved >= 600 and (pixelsMoved / 200).is_integer():
                     pipeSpawn = random.randint(50, 400)
-
-                    print(f"*{pixelsMoved}")
 
                     pipes.append([350, pipeSpawn])
 
@@ -115,6 +116,21 @@ while True:
                     pipeRect = pipeBottom.get_rect()
                     pipeRect.midtop = (pipes[i][0], pipes[i][1] + 50)
                     screen.blit(pipeBottom, pipeRect)
+
+                while birdJump:
+                    clock.tick(30)
+                    birdJumpPixels -= 10
+                    birdPositionY -= 10
+
+                    if birdJumpPixels <= -50:
+                        birdJump = False
+                    break
+
+                while not birdJump:
+                    clock.tick(30)
+                    birdFallPixels = birdFallPixels + gravity
+                    birdPositionY += birdFallPixels
+                    break
 
                 bird = pygame.image.load("assets/yellowbird-upflap.png").convert()
                 birdRect = bird.get_rect()
@@ -182,3 +198,8 @@ while True:
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         exit()
+
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        birdJump = True
+                        birdJumpPixels = 0
+                        birdFallPixels = 0

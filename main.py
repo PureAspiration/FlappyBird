@@ -23,185 +23,186 @@ blue = (0, 0, 128)
 red = (255, 0, 0)
 transparent = (0, 0, 0, 0)
 
-background = pygame.image.load("assets/background-day.png").convert()
-backgroundRect = background.get_rect()
-backgroundRect.topleft = (0, 0)
-screen.blit(background, backgroundRect)
 
-startScreen = pygame.image.load("assets/message.png").convert_alpha()
-startScreenRect = startScreen.get_rect()
-startScreenRect.center = (width / 2, height / 2)
-screen.blit(startScreen, startScreenRect)
+def game():
+    background = pygame.image.load("assets/background-day.png").convert()
+    backgroundRect = background.get_rect()
+    backgroundRect.topleft = (0, 0)
+    screen.blit(background, backgroundRect)
 
-birdPositionX, birdPositionY = 144, 304
+    startScreen = pygame.image.load("assets/message.png").convert_alpha()
+    startScreenRect = startScreen.get_rect()
+    startScreenRect.center = (width / 2, height / 2)
+    screen.blit(startScreen, startScreenRect)
 
-floor = 288
+    birdPositionX, birdPositionY = 144, 304
 
-while True:
-    clock.tick(30)
+    floor = 288
 
-    base = pygame.image.load("assets/base.png").convert()
-    baseRect = base.get_rect()
-    baseRect.midright = (floor, 500)
-    screen.blit(base, baseRect)
-    base = pygame.image.load("assets/base.png").convert()
-    baseRect = base.get_rect()
-    baseRect.midleft = (floor, 500)
-    screen.blit(base, baseRect)
+    while True:
+        clock.tick(30)
 
-    floor -= 4
+        base = pygame.image.load("assets/base.png").convert()
+        baseRect = base.get_rect()
+        baseRect.midright = (floor, 500)
+        screen.blit(base, baseRect)
+        base = pygame.image.load("assets/base.png").convert()
+        baseRect = base.get_rect()
+        baseRect.midleft = (floor, 500)
+        screen.blit(base, baseRect)
 
-    if floor <= 0:
-        floor = 288
+        floor -= 4
 
-    pygame.display.update()
+        if floor <= 0:
+            floor = 288
 
-    for event in pygame.event.get():
+        pygame.display.update()
 
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+        for event in pygame.event.get():
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse = pygame.mouse.get_pos()
-            print(f"{mouse[0]} {mouse[1]}")
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
-            score = 0
-            pixelsMoved = 0
-            pipes = []
-            birdJump = False
-            birdJumpPixels = 0
-            birdFallPixels = 0
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse = pygame.mouse.get_pos()
+                print(f"{mouse[0]} {mouse[1]}")
 
-            while True:
-                clock.tick(30)
+                score = 0
+                pixelsMoved = 0
+                pipes = []
+                birdJump = False
+                birdJumpPixels = 0
+                birdFallPixels = 0
 
-                screen.fill(black)
+                while True:
+                    clock.tick(30)
 
-                background = pygame.image.load("assets/background-day.png").convert()
-                backgroundRect = background.get_rect()
-                backgroundRect.topleft = (0, 0)
-                screen.blit(background, backgroundRect)
+                    screen.fill(black)
 
-                floor -= 4
-                if floor <= 0:
-                    floor = 288
+                    background = pygame.image.load("assets/background-day.png").convert()
+                    backgroundRect = background.get_rect()
+                    backgroundRect.topleft = (0, 0)
+                    screen.blit(background, backgroundRect)
 
-                pixelsMoved += 4
-                if pixelsMoved >= 600 and (pixelsMoved / 200).is_integer():
-                    pipeSpawn = random.randint(50, 400)
+                    floor -= 4
+                    if floor <= 0:
+                        floor = 288
 
-                    pipes.append([350, pipeSpawn])
+                    pixelsMoved += 4
+                    if pixelsMoved >= 600 and (pixelsMoved / 200).is_integer():
+                        pipeSpawn = random.randint(50, 400)
 
-                for i in range(len(pipes)):
-                    print(pipes)
-                    print("------------------------")
-                    pipes[i][0] -= 4
+                        pipes.append([350, pipeSpawn])
 
-                    if pipes[i][0] <= -100:
-                        pipes.pop(0)
+                    for i in range(len(pipes)):
+                        print(pipes)
+                        print("------------------------")
+                        pipes[i][0] -= 4
+
+                        if pipes[i][0] <= -100:
+                            pipes.pop(0)
+                            break
+
+                    for i in range(len(pipes)):
+                        if pipes[i][0] == 142:
+                            score += 1
+
+                    for i in range(len(pipes)):
+                        pipeTop = pygame.image.load("assets/pipe-green.png").convert()
+                        pipeTop = pygame.transform.rotate(pipeTop, 180)
+                        pipeRect = pipeTop.get_rect()
+                        pipeRect.midbottom = (pipes[i][0], pipes[i][1] - 50)
+                        screen.blit(pipeTop, pipeRect)
+
+                        pipeBottom = pygame.image.load("assets/pipe-green.png").convert()
+                        pipeRect = pipeBottom.get_rect()
+                        pipeRect.midtop = (pipes[i][0], pipes[i][1] + 50)
+                        screen.blit(pipeBottom, pipeRect)
+
+                    while birdJump:
+                        clock.tick(30)
+                        birdJumpPixels -= 10
+                        birdPositionY -= 10
+
+                        if birdJumpPixels <= -50:
+                            birdJump = False
                         break
 
-                for i in range(len(pipes)):
-                    if pipes[i][0] == 142:
-                        score += 1
+                    while not birdJump:
+                        clock.tick(30)
+                        birdFallPixels = birdFallPixels + gravity
+                        birdPositionY += birdFallPixels
+                        break
 
-                for i in range(len(pipes)):
-                    pipeTop = pygame.image.load("assets/pipe-green.png").convert()
-                    pipeTop = pygame.transform.rotate(pipeTop, 180)
-                    pipeRect = pipeTop.get_rect()
-                    pipeRect.midbottom = (pipes[i][0], pipes[i][1] - 50)
-                    screen.blit(pipeTop, pipeRect)
+                    bird = pygame.image.load("assets/yellowbird-upflap.png").convert()
+                    birdRect = bird.get_rect()
+                    birdRect.center = (birdPositionX, birdPositionY)
+                    screen.blit(bird, birdRect)
 
-                    pipeBottom = pygame.image.load("assets/pipe-green.png").convert()
-                    pipeRect = pipeBottom.get_rect()
-                    pipeRect.midtop = (pipes[i][0], pipes[i][1] + 50)
-                    screen.blit(pipeBottom, pipeRect)
+                    base = pygame.image.load("assets/base.png").convert()
+                    baseRect = base.get_rect()
+                    baseRect.midright = (floor, 500)
+                    screen.blit(base, baseRect)
+                    base = pygame.image.load("assets/base.png").convert()
+                    baseRect = base.get_rect()
+                    baseRect.midleft = (floor, 500)
+                    screen.blit(base, baseRect)
 
-                while birdJump:
-                    clock.tick(30)
-                    birdJumpPixels -= 10
-                    birdPositionY -= 10
+                    if len(str(score)) == 1:
+                        scoreNumber = pygame.image.load(f"assets/numbers/{score}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.center = (width / 2, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                    elif len(str(score)) == 2:
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[0]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midright = (width / 2, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[1]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midleft = (width / 2, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                    elif len(str(score)) == 3:
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[0]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midright = (width / 2 - 12, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[1]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.center = (width / 2, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[2]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midleft = (width / 2 + 12, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                    elif len(str(score)) == 4:
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[0]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midright = (width / 2 - 24, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[1]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midright = (width / 2, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[2]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midleft = (width / 2, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
+                        scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[3]}.png").convert_alpha()
+                        scoreNumberRect = scoreNumber.get_rect()
+                        scoreNumberRect.midleft = (width / 2 + 24, 100)
+                        screen.blit(scoreNumber, scoreNumberRect)
 
-                    if birdJumpPixels <= -50:
-                        birdJump = False
-                    break
+                    pygame.display.update()
 
-                while not birdJump:
-                    clock.tick(30)
-                    birdFallPixels = birdFallPixels + gravity
-                    birdPositionY += birdFallPixels
-                    break
+                    if birdPositionY <= -50:
+                        print("Out Of Bounds")
+                        birdPositionY = -49
 
-                bird = pygame.image.load("assets/yellowbird-upflap.png").convert()
-                birdRect = bird.get_rect()
-                birdRect.center = (birdPositionX, birdPositionY)
-                screen.blit(bird, birdRect)
+                    if birdPositionY >= 430:
+                        print("Game over")
 
-                base = pygame.image.load("assets/base.png").convert()
-                baseRect = base.get_rect()
-                baseRect.midright = (floor, 500)
-                screen.blit(base, baseRect)
-                base = pygame.image.load("assets/base.png").convert()
-                baseRect = base.get_rect()
-                baseRect.midleft = (floor, 500)
-                screen.blit(base, baseRect)
-
-                if len(str(score)) == 1:
-                    scoreNumber = pygame.image.load(f"assets/numbers/{score}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.center = (width / 2, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                elif len(str(score)) == 2:
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[0]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midright = (width / 2, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[1]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midleft = (width / 2, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                elif len(str(score)) == 3:
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[0]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midright = (width / 2 - 12, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[1]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.center = (width / 2, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[2]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midleft = (width / 2 + 12, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                elif len(str(score)) == 4:
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[0]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midright = (width / 2 - 24, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[1]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midright = (width / 2, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[2]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midleft = (width / 2, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-                    scoreNumber = pygame.image.load(f"assets/numbers/{str(score)[3]}.png").convert_alpha()
-                    scoreNumberRect = scoreNumber.get_rect()
-                    scoreNumberRect.midleft = (width / 2 + 24, 100)
-                    screen.blit(scoreNumber, scoreNumberRect)
-
-                pygame.display.update()
-
-                if birdPositionY <= -50:
-                    print("Out Of Bounds")
-                    birdPositionY = -49
-
-                if birdPositionY >= 430:
-                    print("Game over")
-
-                    while True:
                         background = pygame.image.load("assets/background-day.png").convert()
                         backgroundRect = background.get_rect()
                         backgroundRect.topleft = (0, 0)
@@ -244,15 +245,29 @@ while True:
                         scoreMenuRect.center = (width / 2, height / 2)
                         screen.blit(scoreMenu, scoreMenuRect)
 
+                        button = pygame.image.load("assets/button-ok.png").convert()
+                        button = pygame.transform.scale(button, (125, 41))
+                        buttonRect = button.get_rect()
+                        buttonRect.center = (width / 2, 400)
+                        screen.blit(button, buttonRect)
+
+                        global highScore
+                        if score > highScore:
+                            highScore = score
+                            print("New High Score!")
+                            scoreNew = pygame.image.load("assets/scores-new.png").convert()
+                            scoreNew = pygame.transform.scale(scoreNew, (55, 26))
+                            scoreNewRect = scoreNew.get_rect()
+                            scoreNewRect.center = (115, 268)
+                            screen.blit(scoreNew, scoreNewRect)
+                            print("New High Score!")
+
                         for i in range(len(str(score))):
                             scoreDigit = str(score)[len(str(score)) - i - 1]
                             scoreNumber = pygame.image.load(f"assets/numbers/{scoreDigit}.png").convert_alpha()
                             scoreNumberRect = scoreNumber.get_rect()
                             scoreNumberRect.center = (195 - (i * 25), 230)
                             screen.blit(scoreNumber, scoreNumberRect)
-
-                        if score > highScore:
-                            highScore = score
 
                         for i in range(len(str(score))):
                             highScoreDigit = str(score)[len(str(highScore)) - i - 1]
@@ -263,19 +278,31 @@ while True:
 
                         pygame.display.update()
 
-                        for event in pygame.event.get():
+                        while True:
+                            for event in pygame.event.get():
 
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                                exit()
+                                if event.type == pygame.QUIT:
+                                    pygame.quit()
+                                    exit()
 
-                for event in pygame.event.get():
+                                elif event.type == pygame.MOUSEBUTTONDOWN:
+                                    mouse = pygame.mouse.get_pos()
+                                    print(f"{mouse[0]} {mouse[1]}")
 
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        exit()
+                                    if 82 < mouse[0] < 206 and 380 < mouse[1] < 420:
+                                        print("Restarting")
+                                        game()
 
-                    elif event.type == pygame.MOUSEBUTTONDOWN:
-                        birdJump = True
-                        birdJumpPixels = 0
-                        birdFallPixels = 0
+                    for event in pygame.event.get():
+
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+
+                        elif event.type == pygame.MOUSEBUTTONDOWN:
+                            birdJump = True
+                            birdJumpPixels = 0
+                            birdFallPixels = 0
+
+
+game()
